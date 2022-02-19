@@ -9,7 +9,6 @@ const newPost = require('./models/newPost');
 
 fs.readFile('/var/openfaas/secrets/mongouri', 'utf8', (secretError, mongoUri) => {
   console.log(secretError); // eslint-disable-line no-console
-  console.log(mongoUri); // eslint-disable-line no-console
   mongoose.connect(
     mongoUri,
     {
