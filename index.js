@@ -59,6 +59,7 @@ const insertNewPosts = (newPosts) => {
     })
     .fin(() => {
       insertPromises = [];
+      mongoose.disconnect();
     })
     .done();
 };
@@ -66,20 +67,20 @@ const insertNewPosts = (newPosts) => {
 const subreddit = process.env.SUBREDDIT || 'politics';
 const redditUrl = `https://www.reddit.com/r/${subreddit}/rising.json`;
 
-const fetchPosts = () => rp({ uri: redditUrl, timeout: 4000 })
-  .then(parseHtmlJson)
-  .then(insertNewPosts)
-  .then(
-    console.log(`Saved New Posts @ ${Date.now()}`), // eslint-disable-line no-console
-    console.log(`Currently using ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB of memory \n`), // eslint-disable-line no-console
-  )
-  .catch(() => {
-    console.warn(`Error Fetching Posts @ ${Date.now()}. This may be due to a timeout from Reddit.`); // eslint-disable-line no-console
-  })
-  .finally(() => {
-    mongoose.disconnect();
-  })
-  .done();
+const fetchPosts = () => {
+  rp({ uri: redditUrl, timeout: 4000 })
+    .then(parseHtmlJson)
+    .then(insertNewPosts)
+    .then(
+      console.log(`Saved New Posts @ ${Date.now()}`), // eslint-disable-line no-console
+      console.log(`Currently using ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB of memory \n`), // eslint-disable-line no-console
+    )
+    .catch(() => {
+      console.warn(`Error Fetching Posts @ ${Date.now()}. This may be due to a timeout from Reddit.`); // eslint-disable-line no-console
+      mongoose.disconnect();
+    })
+    .done();
+};
 
 mongoose.connection.on('connected', () => {
   console.log(`F5 is now saving posts to MongoDB from ${subreddit}...\n`); // eslint-disable-line no-console
