@@ -8,7 +8,10 @@ const rp = require('request-promise');
 const newPost = require('./models/newPost');
 
 fs.readFile('/var/openfaas/secrets/mongouri', 'utf8', (secretError, mongoUri) => {
-  console.log(secretError); // eslint-disable-line no-console
+  if (secretError) {
+    console.log(secretError); // eslint-disable-line no-console
+  }
+
   mongoose.connect(
     mongoUri,
     {
@@ -73,10 +76,14 @@ const fetchPosts = () => rp({ uri: redditUrl, timeout: 4000 })
   )
   .catch(() => {
     console.warn(`Error Fetching Posts @ ${Date.now()}. This may be due to a timeout from Reddit.`); // eslint-disable-line no-console
-  });
+  })
+  .fin(() => {
+    mongoose.disconnect();
+  })
+  .done();
 
 mongoose.connection.on('connected', () => {
-  console.log('F5 is now saving posts to MongoDB...\n'); // eslint-disable-line no-console
+  console.log(`F5 is now saving posts to MongoDB from ${subreddit}...\n`); // eslint-disable-line no-console
   fetchPosts();
 });
 
