@@ -59,7 +59,6 @@ const insertNewPosts = (newPosts) => {
     })
     .fin(() => {
       insertPromises = [];
-      mongoose.disconnect();
     })
     .done();
 };
@@ -77,7 +76,7 @@ const fetchPosts = () => rp({ uri: redditUrl, timeout: 4000 })
   .catch(() => {
     console.warn(`Error Fetching Posts @ ${Date.now()}. This may be due to a timeout from Reddit.`); // eslint-disable-line no-console
   })
-  .fin(() => {
+  .finally(() => {
     mongoose.disconnect();
   })
   .done();
