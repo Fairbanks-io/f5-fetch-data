@@ -1,6 +1,6 @@
 {
   "name": "f5-fetch-data",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Scheduled job for pulling reddit data into MongoDB",
   "main": "index.js",
   "dependencies": {
