@@ -15,6 +15,7 @@ const fetchedPost = new mongoose.Schema({
     default: new Date(),
     expires: 86400,
   },
+  sub: 'string',
 }, { collection: 'newposts' });
 
 const newPost = mongoose.model('newPost', fetchedPost);

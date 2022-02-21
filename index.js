@@ -7,6 +7,9 @@ const rp = require('request-promise');
 
 const newPost = require('./models/newPost');
 
+const subreddit = process.env.SUBREDDIT || 'politics';
+const redditUrl = `https://www.reddit.com/r/${subreddit}/rising.json`;
+
 fs.readFile('/var/openfaas/secrets/mongouri', 'utf8', (secretError, mongoUri) => {
   if (secretError) {
     console.log(secretError); // eslint-disable-line no-console
@@ -50,6 +53,7 @@ const insertNewPosts = (newPosts) => {
       upvoteCount: value.data.ups,
       commentCount: value.data.num_comments,
       fetchedAt: new Date(),
+      sub: subreddit,
     }, { upsert: true }));
   });
 
@@ -63,9 +67,6 @@ const insertNewPosts = (newPosts) => {
     })
     .done();
 };
-
-const subreddit = process.env.SUBREDDIT || 'politics';
-const redditUrl = `https://www.reddit.com/r/${subreddit}/rising.json`;
 
 const fetchPosts = () => {
   rp({ uri: redditUrl, timeout: 4000 })
